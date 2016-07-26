@@ -1,7 +1,8 @@
 /*
  Copyright (c) 2015, Apple Inc. All rights reserved.
  Copyright (c) 2015, Bruce Duncan.
- 
+ Copyright (c) 2016, Ricardo Sánchez-Sáez.
+
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
  
@@ -33,6 +34,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <ResearchKit/ORKDefines.h>
+#import <ResearchKit/ORKTypes.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -104,7 +106,12 @@ typedef NS_ENUM(NSInteger, ORKQuestionType) {
      In a time interval question, the participant can enter a time span by using a picker.
      */
     ORKQuestionTypeTimeInterval,
-    
+
+    /**
+     In a height question, the participant can enter a height by using a height picker.
+     */
+    ORKQuestionTypeHeight,
+
     /**
      In a location question, the participant can enter a location using a map view.
      */
@@ -154,6 +161,7 @@ typedef NS_ENUM(NSInteger, ORKNumberFormattingStyle) {
 @class ORKTextAnswerFormat;
 @class ORKEmailAnswerFormat;
 @class ORKTimeIntervalAnswerFormat;
+@class ORKHeightAnswerFormat;
 @class ORKLocationAnswerFormat;
 
 @class ORKTextChoice;
@@ -256,6 +264,9 @@ ORK_CLASS_AVAILABLE
 + (ORKTimeIntervalAnswerFormat *)timeIntervalAnswerFormatWithDefaultInterval:(NSTimeInterval)defaultInterval
                                                                         step:(NSInteger)step;
 
++ (ORKHeightAnswerFormat *)heightAnswerFormat;
++ (ORKHeightAnswerFormat *)heightAnswerFormatWithMeasurementSystem:(ORKMeasurementSystem)measurementSystem;
+
 + (ORKLocationAnswerFormat *)locationAnswerFormat;
 
 /// @name Validation
@@ -276,12 +287,22 @@ ORK_CLASS_AVAILABLE
  The `ORKScaleAnswerFormat `class represents an answer format that includes a slider control.
  
  The scale answer format produces an `ORKScaleQuestionResult` object that contains an integer whose
- value is between the scale's minimum and maximum values, and represents one of the quantized step 
+ value is between the scale's minimum and maximum values, and represents one of the quantized step
  values.
+
+ The following are the rules bound with scale answer format -
+ 
+ * Minimum number of step in a task should not be less than 1.
+ * Minimum number of section on a scale (step count) should not be less than 1.
+ * Maximum number of section on a scale (step count) should not be more than 13.
+ * The lower bound value in scale answer format cannot be lower than - 10000.
+ * The upper bound value in scale answer format cannot be more than 10000.
+
  */
 ORK_CLASS_AVAILABLE
 @interface ORKScaleAnswerFormat : ORKAnswerFormat
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -424,6 +445,7 @@ ORK_CLASS_AVAILABLE
 ORK_CLASS_AVAILABLE
 @interface ORKContinuousScaleAnswerFormat : ORKAnswerFormat
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -519,12 +541,12 @@ ORK_CLASS_AVAILABLE
 @property (readonly, getter=isVertical) BOOL vertical;
 
 /**
- Formatting style applied to the minimum, maximum, and slider values.
+ A formatting style applied to the minimum, maximum, and slider values.
  */
 @property ORKNumberFormattingStyle numberStyle;
 
 /**
- Number formatter applied to the minimum, maximum, and slider values. Can be overridden by
+ A number formatter applied to the minimum, maximum, and slider values. Can be overridden by
  subclasses.
  */
 @property (readonly) NSNumberFormatter *numberFormatter;
@@ -540,14 +562,14 @@ ORK_CLASS_AVAILABLE
 @property (readonly, nullable) NSString *minimumValueDescription;
 
 /**
- An image for the upper bound of the slider. The recommended image size is 30 x 30 points.
- The maximum range label will not be visible.
+ An image for the upper bound of the slider. 
+ @discussion The recommended image size is 30 x 30 points. The maximum range label will not be visible.
  */
 @property (strong, nullable) UIImage *maximumImage;
 
 /**
- An image for the lower bound of the slider. The recommended image size is 30 x 30 points.
- The minimum range label will not be visible.
+ An image for the lower bound of the slider. 
+ @discussion The recommended image size is 30 x 30 points. The minimum range label will not be visible.
  */
 @property (strong, nullable) UIImage *minimumImage;
 
@@ -563,6 +585,7 @@ ORK_CLASS_AVAILABLE
 ORK_CLASS_AVAILABLE
 @interface ORKTextScaleAnswerFormat : ORKAnswerFormat
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -639,6 +662,7 @@ ORK_CLASS_AVAILABLE
 ORK_CLASS_AVAILABLE
 @interface ORKValuePickerAnswerFormat : ORKAnswerFormat
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -677,6 +701,7 @@ ORK_CLASS_AVAILABLE
 ORK_CLASS_AVAILABLE
 @interface ORKImageChoiceAnswerFormat : ORKAnswerFormat
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -712,6 +737,7 @@ ORK_CLASS_AVAILABLE
 ORK_CLASS_AVAILABLE
 @interface ORKTextChoiceAnswerFormat : ORKAnswerFormat
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -765,6 +791,7 @@ ORK_CLASS_AVAILABLE
 ORK_CLASS_AVAILABLE
 @interface ORKTextChoice : NSObject <NSSecureCoding, NSCopying, NSObject>
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -858,6 +885,7 @@ ORK_CLASS_AVAILABLE
 ORK_CLASS_AVAILABLE
 @interface ORKImageChoice : NSObject <NSSecureCoding, NSCopying>
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -915,7 +943,7 @@ ORK_CLASS_AVAILABLE
  The text to display when the image is selected, in a localized string. (read-only)
  
  Note that the text you supply may be spoken by VoiceOver even when the item is not selected.
-  */
+*/
 @property (copy, readonly, nullable) NSString *text;
 
 /**
@@ -961,6 +989,7 @@ typedef NS_ENUM(NSInteger, ORKNumericAnswerStyle) {
 ORK_CLASS_AVAILABLE
 @interface ORKNumericAnswerFormat : ORKAnswerFormat
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -1089,6 +1118,7 @@ typedef NS_ENUM(NSInteger, ORKDateAnswerStyle) {
 ORK_CLASS_AVAILABLE
 @interface ORKDateAnswerFormat : ORKAnswerFormat
 
++ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -1103,15 +1133,14 @@ ORK_CLASS_AVAILABLE
 /**
  Returns an initialized date answer format using the specified answer style and default date values.
  
- 
  This method is the designated initializer.
  
  @param style           The style of date answer, such as date, or date and time.
  @param defaultDate     The default date to display. When the value of this parameter is `nil`, the
                             picker displays the current time.
- @param minimumDate     The minimum date that is accessible in the picker. If the value of this 
+ @param minimumDate     The minimum date that is accessible in the picker. If the value of this
                             parameter is `nil`, there is no minimum.
- @param maximumDate     The maximum date that is accessible in the picker. If the value of this 
+ @param maximumDate     The maximum date that is accessible in the picker. If the value of this
                             parameter is `nil`, there is no maximum.
  @param calendar        The calendar to use. If the value of this parameter is `nil`, the picker
                             uses the default calendar for the current locale.
@@ -1316,6 +1345,44 @@ ORK_CLASS_AVAILABLE
  By default, the value of this property is 1. The minimum value is 1, and the maximum value is 30.
  */
 @property (readonly) NSInteger step;
+
+@end
+
+
+/**
+ The `ORKHeightAnswerFormat` class represents the answer format for questions that require users
+ to enter a height.
+ 
+ A height answer format produces an `ORKNumericQuestionResult` object. The result is always reported
+ in the metric system using the `cm` unit.
+ */
+ORK_CLASS_AVAILABLE
+@interface ORKHeightAnswerFormat : ORKAnswerFormat
+
+/**
+ Returns an initialized height answer format using the measurement system specified in the current
+ locale.
+ 
+ @return An initialized height answer format.
+ */
+- (instancetype)init;
+
+/**
+ Returns an initialized height answer format using the specified measurement system.
+ 
+ This method is the designated initializer.
+ 
+ @param measurementSystem   The measurement system to use. See `ORKMeasurementSystem` for the
+                                accepted values.
+ 
+ @return An initialized height answer format.
+ */
+- (instancetype)initWithMeasurementSystem:(ORKMeasurementSystem)easurementSystem NS_DESIGNATED_INITIALIZER;
+
+/**
+ Indicates the measurement system used by the answer format.
+ */
+@property (readonly) ORKMeasurementSystem measurementSystem;
 
 @end
 
