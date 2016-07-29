@@ -3229,9 +3229,8 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TOOLCHAINS = com.apple.dt.toolchain.Swift_2_3;
 			};
 			name = Debug;
 		};
@@ -3262,9 +3261,8 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TOOLCHAINS = com.apple.dt.toolchain.Swift_2_3;
 			};
 			name = Release;
 		};

@@ -46,8 +46,8 @@ public extension ORKPredicateStepNavigationRule {
     
     #else
     
-    convenience init(resultPredicatesAndDestinationStepIdentifiers tuples: [ (resultPredicate: NSPredicate, destinationStepIdentifier: String) ], defaultStepIdentifierOrNil: String? = nil ) {
-        var resultPredicates: [NSPredicate] = []
+    convenience init(resultPredicatesAndDestinationStepIdentifiers tuples: [ (resultPredicate: Predicate, destinationStepIdentifier: String) ], defaultStepIdentifierOrNil: String? = nil ) {
+        var resultPredicates: [Predicate] = []
         var destinationStepIdentifiers: [String] = []
         for tuple in tuples {
             resultPredicates.append(tuple.resultPredicate)
