@@ -32,7 +32,7 @@ import Foundation
 
 public extension ORKPredicateStepNavigationRule {
     
-    #if swift(>=3.0)
+    #if swift(>=3.1)
     
     convenience init(resultPredicatesAndDestinationStepIdentifiers tuples: [ (resultPredicate: Predicate, destinationStepIdentifier: String) ], defaultStepIdentifierOrNil: String? = nil ) {
         var resultPredicates: [Predicate] = []
