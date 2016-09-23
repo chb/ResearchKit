@@ -29,19 +29,12 @@
  */
 
 
-#import <XCTest/XCTest.h>
-#import <Foundation/Foundation.h>
-#import <ResearchKit/ResearchKit.h>
-#import <ResearchKit/ResearchKit_Private.h>
-#import <CoreMotion/CoreMotion.h>
-#import <objc/runtime.h>
-#import <stdio.h>
-#import <stdlib.h>
-#import <HealthKit/HealthKit.h>
-#import <MapKit/MapKit.h>
+@import XCTest;
+@import ResearchKit.Private;
 
-#import <ResearchKit/ORKResult_Private.h>
 #import "ORKESerialization.h"
+
+#import <objc/runtime.h>
 
 
 @interface ClassProperty : NSObject
@@ -367,6 +360,7 @@ ORK_MAKE_TEST_INIT(ORKLocation, (^{
                                               @"ORKTextAnswerFormat.autocorrectionType",
                                               @"ORKTextAnswerFormat.spellCheckingType",
                                               @"ORKInstructionStep.image",
+                                              @"ORKInstructionStep.auxiliaryImage",
                                               @"ORKImageChoice.normalStateImage",
                                               @"ORKImageChoice.selectedStateImage",
                                               @"ORKImageCaptureStep.templateImage",
@@ -602,6 +596,7 @@ ORK_MAKE_TEST_INIT(ORKLocation, (^{
                                               @"ORKConsentSignature.signatureImage",
                                               @"ORKConsentSection.customImage",
                                               @"ORKInstructionStep.image",
+                                              @"ORKInstructionStep.auxiliaryImage",
                                               @"ORKActiveStep.image",
                                               @"ORKSpatialSpanMemoryStep.customTargetImage",
                                               @"ORKScaleAnswerFormat.minimumImage",

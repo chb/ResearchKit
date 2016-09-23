@@ -33,12 +33,15 @@
 
 
 #import "MainViewController.h"
-#import <ResearchKit/ResearchKit_Private.h>
-#import <AVFoundation/AVFoundation.h>
-#import "DynamicTask.h"
+
 #import "AppDelegate.h"
+#import "DynamicTask.h"
 #import "ORKTest-Swift.h"
 #import "DragonPokerStep.h"
+
+@import ResearchKit;
+
+@import AVFoundation;
 
 
 #define DefineStringKey(x) static NSString *const x = @#x
@@ -57,12 +60,14 @@ DefineStringKey(ImageChoicesTaskIdentifier);
 DefineStringKey(InstantiateCustomVCTaskIdentifier);
 DefineStringKey(LocationTaskIdentifier);
 DefineStringKey(ScalesTaskIdentifier);
+DefineStringKey(ColorScalesTaskIdentifier);
 DefineStringKey(MiniFormTaskIdentifier);
 DefineStringKey(OptionalFormTaskIdentifier);
 DefineStringKey(SelectionSurveyTaskIdentifier);
 
 DefineStringKey(ActiveStepTaskIdentifier);
 DefineStringKey(AudioTaskIdentifier);
+DefineStringKey(AuxillaryImageTaskIdentifier);
 DefineStringKey(FitnessTaskIdentifier);
 DefineStringKey(GaitTaskIdentifier);
 DefineStringKey(HolePegTestTaskIdentifier);
@@ -73,6 +78,8 @@ DefineStringKey(TwoFingerTapTaskIdentifier);
 DefineStringKey(TimedWalkTaskIdentifier);
 DefineStringKey(ToneAudiometryTaskIdentifier);
 DefineStringKey(TowerOfHanoiTaskIdentifier);
+DefineStringKey(TremorTaskIdentifier);
+DefineStringKey(TremorRightHandTaskIdentifier);
 DefineStringKey(WalkBackAndForthTaskIdentifier);
 
 DefineStringKey(CreatePasscodeTaskIdentifier);
@@ -338,6 +345,7 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
                            @"Image Choices",
                            @"Location",
                            @"Scale",
+                           @"Scale Color Gradient",
                            @"Mini Form",
                            @"Optional Form",
                            @"Selection Survey",
@@ -355,7 +363,9 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
                            @"Tone Audiometry Task",
                            @"Tower Of Hanoi Task",
                            @"Two Finger Tapping Task",
-                           @"Walk And Turn Task"
+                           @"Walk And Turn Task",
+                           @"Hand Tremor Task",
+                           @"Right Hand Tremor Task",
                            ],
                        @[ // Passcode
                            @"Authenticate Passcode",
@@ -383,6 +393,7 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
                            @"Instantiate Custom VC",
                            @"Table Step",
                            @"Signature Step",
+                           @"Auxillary Image",
                            ],
                        ];
 }
@@ -520,6 +531,8 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
         return [self makeInterruptibleTask];
     } else if ([identifier isEqualToString:ScalesTaskIdentifier]) {
         return [self makeScalesTask];
+    } else if ([identifier isEqualToString:ColorScalesTaskIdentifier]) {
+        return [self makeColorScalesTask];
     } else if ([identifier isEqualToString:ImageChoicesTaskIdentifier]) {
         return [self makeImageChoicesTask];
     } else if ([identifier isEqualToString:ImageCaptureTaskIdentifier]) {
@@ -601,9 +614,27 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
                                                           options:ORKPredefinedTaskOptionNone];
     } else if ([identifier isEqualToString:TableStepTaskIdentifier]) {
         return [self makeTableStepTask];
-    }
-    else if ([identifier isEqualToString:SignatureStepTaskIdentifier]) {
+    } else if ([identifier isEqualToString:SignatureStepTaskIdentifier]) {
         return [self makeSignatureStepTask];
+    } else if ([identifier isEqualToString:TremorTaskIdentifier]) {
+        return [ORKOrderedTask tremorTestTaskWithIdentifier:TremorTaskIdentifier
+                                     intendedUseDescription:nil
+                                         activeStepDuration:10
+                                          activeTaskOptions:
+                ORKTremorActiveTaskOptionExcludeHandAtShoulderHeight |
+                ORKTremorActiveTaskOptionExcludeHandAtShoulderHeightElbowBent |
+                ORKTremorActiveTaskOptionExcludeHandToNose
+                                                handOptions:ORKPredefinedTaskHandOptionBoth
+                                                    options:ORKPredefinedTaskOptionNone];
+    } else if ([identifier isEqualToString:TremorRightHandTaskIdentifier]) {
+        return [ORKOrderedTask tremorTestTaskWithIdentifier:TremorRightHandTaskIdentifier
+                                     intendedUseDescription:nil
+                                         activeStepDuration:10
+                                          activeTaskOptions:0
+                                                handOptions:ORKPredefinedTaskHandOptionRight
+                                                    options:ORKPredefinedTaskOptionNone];
+    } else if ([identifier isEqualToString:AuxillaryImageTaskIdentifier]) {
+        return [self makeAuxillaryImageTask];
     }
 
     return nil;
@@ -2318,6 +2349,14 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
     [self beginTaskWithIdentifier:WalkBackAndForthTaskIdentifier];
 }
 
+- (void)handTremorTaskButtonTapped:(id)sender {
+    [self beginTaskWithIdentifier:TremorTaskIdentifier];
+}
+
+- (void)rightHandTremorTaskButtonTapped:(id)sender {
+    [self beginTaskWithIdentifier:TremorRightHandTaskIdentifier];
+}
+
 #pragma mark - Dynamic task
 
 /*
@@ -2672,6 +2711,30 @@ static const CGFloat HeaderSideLayoutMargin = 16.0;
 
 - (void)scaleButtonTapped:(id)sender {
     [self beginTaskWithIdentifier:ScalesTaskIdentifier];
+}
+
+- (id<ORKTask>)makeColorScalesTask {
+    ORKOrderedTask *task = (ORKOrderedTask *)[self makeScalesTask];
+    
+    for (ORKQuestionStep *step in task.steps) {
+        if ([step isKindOfClass:[ORKQuestionStep class]]) {
+            ORKAnswerFormat *answerFormat  = step.answerFormat;
+            if ([answerFormat respondsToSelector:@selector(setGradientColors:)]) {
+                [answerFormat performSelector:@selector(setGradientColors:) withObject:@[[UIColor redColor],
+                                                                                         [UIColor greenColor],
+                                                                                         [UIColor greenColor],
+                                                                                         [UIColor yellowColor],
+                                                                                         [UIColor yellowColor]]];
+                [answerFormat performSelector:@selector(setGradientLocations:) withObject:@[@0.2, @0.2, @0.7, @0.7, @0.8]];
+            }
+        }
+    }
+    
+    return task;
+}
+
+- (void)scaleColorGradientButtonTapped:(id)sender {
+    [self beginTaskWithIdentifier:ColorScalesTaskIdentifier];
 }
 
 #pragma mark - Image choice task
@@ -3658,6 +3721,23 @@ stepViewControllerWillAppear:(ORKStepViewController *)stepViewController {
     }];
 }
 
+/**
+  When a task has completed it calls this method to post the result of the task to the delegate.
+*/
+- (void)taskViewController:(ORKTaskViewController *)taskViewController didChangeResult:(ORKTaskResult *)result {
+    /*
+     Upon creation of a Passcode by a user, the results of their creation
+     are returned by getting it from ORKPasscodeResult in this delegate call.
+     This is triggered upon completion/failure/or cancel
+     */
+    ORKStepResult *stepResult = (ORKStepResult *)[[result results] firstObject];
+    if ([[[stepResult results] firstObject] isKindOfClass:[ORKPasscodeResult class]]) {
+        ORKPasscodeResult *passcodeResult = (ORKPasscodeResult *)[[stepResult results] firstObject];
+        NSLog(@"passcode saved: %d , Touch ID Enabled: %d", passcodeResult.passcodeSaved, passcodeResult.touchIdEnabled);
+
+    }
+}
+
 - (void)taskViewController:(ORKTaskViewController *)taskViewController stepViewControllerWillDisappear:(ORKStepViewController *)stepViewController navigationDirection:(ORKStepViewControllerNavigationDirection)direction {
     if ([taskViewController.task.identifier isEqualToString:StepWillDisappearTaskIdentifier] &&
         [stepViewController.step.identifier isEqualToString:StepWillDisappearFirstStepIdentifier]) {
@@ -3973,6 +4053,24 @@ stepViewControllerWillAppear:(ORKStepViewController *)stepViewController {
     [steps addObject:stepLast];
     
     return [[ORKOrderedTask alloc] initWithIdentifier:SignatureStepTaskIdentifier steps:steps];
+}
+
+#pragma mark - Auxillary Image
+
+- (IBAction)auxillaryImageButtonTapped:(id)sender {
+    [self beginTaskWithIdentifier:AuxillaryImageTaskIdentifier];
+}
+
+- (ORKOrderedTask *)makeAuxillaryImageTask {
+
+    ORKInstructionStep *step = [[ORKInstructionStep alloc] initWithIdentifier:AuxillaryImageTaskIdentifier];
+    step.title = @"Title";
+    step.text = @"This is description text.";
+    step.detailText = @"This is detail text.";
+    step.image = [UIImage imageNamed:@"tremortest3a" inBundle:[NSBundle bundleForClass:[ORKOrderedTask class]] compatibleWithTraitCollection:nil];
+    step.auxiliaryImage = [UIImage imageNamed:@"tremortest3b" inBundle:[NSBundle bundleForClass:[ORKOrderedTask class]] compatibleWithTraitCollection:nil];
+    
+    return [[ORKOrderedTask alloc] initWithIdentifier:SignatureStepTaskIdentifier steps:@[step]];
 }
 
 

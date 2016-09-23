@@ -31,8 +31,10 @@
 
 
 #import "ORKESerialization.h"
-#import <ResearchKit/ResearchKit_Private.h>
-#import <MapKit/MapKit.h>
+
+@import ResearchKit.Private;
+
+@import MapKit;
 
 
 static NSString *ORKEStringFromDateISO8601(NSDate *date) {
@@ -884,7 +886,9 @@ encondingTable =
           PROPERTY(step, NSNumber, NSObject, NO, nil, nil),
           PROPERTY(vertical, NSNumber, NSObject, NO, nil, nil),
           PROPERTY(maximumValueDescription, NSString, NSObject, NO, nil, nil),
-          PROPERTY(minimumValueDescription, NSString, NSObject, NO, nil, nil)
+          PROPERTY(minimumValueDescription, NSString, NSObject, NO, nil, nil),
+          PROPERTY(gradientColors, UIColor, NSArray, YES, nil, nil),
+          PROPERTY(gradientLocations, NSNumber, NSArray, YES, nil, nil)
           })),
   ENTRY(ORKContinuousScaleAnswerFormat,
         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
@@ -900,7 +904,9 @@ encondingTable =
                    ^id(id numeric) { return tableMapForward(((NSNumber *)numeric).integerValue, numberFormattingStyleTable()); },
                    ^id(id string) { return @(tableMapReverse(string, numberFormattingStyleTable())); }),
           PROPERTY(maximumValueDescription, NSString, NSObject, NO, nil, nil),
-          PROPERTY(minimumValueDescription, NSString, NSObject, NO, nil, nil)
+          PROPERTY(minimumValueDescription, NSString, NSObject, NO, nil, nil),
+          PROPERTY(gradientColors, UIColor, NSArray, YES, nil, nil),
+          PROPERTY(gradientLocations, NSNumber, NSArray, YES, nil, nil)
           })),
    ENTRY(ORKTextScaleAnswerFormat,
          ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
@@ -910,6 +916,8 @@ encondingTable =
             PROPERTY(textChoices, ORKTextChoice, NSArray<ORKTextChoice *>, NO, nil, nil),
             PROPERTY(defaultIndex, NSNumber, NSObject, NO, nil, nil),
             PROPERTY(vertical, NSNumber, NSObject, NO, nil, nil),
+            PROPERTY(gradientColors, UIColor, NSArray, YES, nil, nil),
+            PROPERTY(gradientLocations, NSNumber, NSArray, YES, nil, nil)
             })),
   ENTRY(ORKTextAnswerFormat,
         ^id(NSDictionary *dict, ORKESerializationPropertyGetter getter) {
@@ -1001,6 +1009,7 @@ encondingTable =
         nil,
         (@{
            PROPERTY(timestamp, NSNumber, NSObject, NO, nil, nil),
+           PROPERTY(duration, NSNumber, NSObject, NO, nil, nil),
            PROPERTY(buttonIdentifier, NSNumber, NSObject, NO,
                     ^id(id numeric) { return tableMapForward(((NSNumber *)numeric).integerValue, buttonIdentifierTable()); },
                     ^id(id string) { return @(tableMapReverse(string, buttonIdentifierTable())); }),
@@ -1147,6 +1156,7 @@ encondingTable =
          nil,
          (@{
             PROPERTY(passcodeSaved, NSNumber, NSObject, YES, nil, nil),
+            PROPERTY(touchIdEnabled, NSNumber, NSObject, YES, nil, nil)
             })),
     ENTRY(ORKQuestionResult,
          nil,
